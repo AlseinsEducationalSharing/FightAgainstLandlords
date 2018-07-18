@@ -4,4 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Alsein.Utilities.Modulization" Version="0.2.2-beta" />
+    <PackageReference Include="Alsein.Utilities.Modulization.Autofac" Version="0.2.2-beta" />
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
+  </ItemGroup>
+
 </Project>
