@@ -23,7 +23,7 @@ namespace FAL.Client.Services
             var (playerCount, roomCount) = await HubConnection.InvokeAsync<(int, int)>("Hello");
             Console.WriteLine($"Welcome to FAL game, there are {playerCount} players online and {roomCount} rooms open.");
             Console.Write("Input your nickname: ");
-        login:
+            login:
             if (!await HubConnection.InvokeAsync<bool>("Login", _nickName = Console.ReadLine()))
             {
                 Console.WriteLine($"The name \"{_nickName}\" has already been taken, please try another:");
@@ -31,7 +31,7 @@ namespace FAL.Client.Services
             }
             Console.WriteLine("Login succeed!");
             Console.Write("Input a room number to join: ");
-        join:
+            join:
             if (int.TryParse(Console.ReadLine(), out var num))
             {
                 if (!await HubConnection.InvokeAsync<bool>("Join", num))
@@ -46,27 +46,12 @@ namespace FAL.Client.Services
                 goto join;
             }
             var player = new LocalPlayer(HubConnection);
-            HubConnection.On<Operation<ServerOperationType>>("GameOperation", x => player.ServerOperation(x));
+
+            HubConnection.On<Operation<ServerOperationType>>("GameOperation", x => player.SendToUpstreamAsync(x));
+            player.ReceiveFromUpstream += async obj => await HubConnection.SendAsync("GameOperation", obj);
 
             var client = Container.Resolve<FALClientService>();
-            var start = client.Start(player);
-
-            var sending = Task.Run(async () =>
-              {
-                  while (true)
-                  {
-                      var operation = await player.ClientOperation();
-                      if (start.IsCompleted)
-                      {
-                          return;
-                      }
-                      await HubConnection.SendAsync("GameOperation", operation);
-                  }
-              });
-
-            await start;
-            await player.SendOperation(null);
-            await sending;
+            await client.Start(player);
         }
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Alsein.Utilities.IO;
 
 namespace FAL
 {
@@ -11,11 +13,30 @@ namespace FAL
 
         public IList<int> Cards { get; set; }
 
-        public abstract Task<Operation<UserOperationType>> ClientOperation();
+        private readonly IAsyncDataEndPoint _upstream;
 
-        public abstract Task ServerOperation(Operation<ServerOperationType> operation);
+        private readonly IAsyncDataEndPoint _downstream;
 
-        public Task ServerOperation(ServerOperationType type, params object[] arguments) => ServerOperation(Operation.Create(type, arguments));
+        public Player()
+        {
+            (_upstream, _downstream) = AsyncDataEndPoint.CreateDuplex();
+        }
+
+        public Task SendToUpstreamAsync(Operation<ServerOperationType> operation) => _upstream.SendAsync(operation);
+
+        public Task SendToUpstreamAsync(ServerOperationType type, params object[] args) => SendToUpstreamAsync(Operation.Create(type, args));
+
+        public async Task<Operation<UserOperationType>> ReceiveFromUpstreamAsync() => (await _upstream.ReceiveAsync<Operation<UserOperationType>>()).Result;
+
+        public event Func<object, Task> ReceiveFromUpstream { add => _upstream.Receive += value; remove => _upstream.Receive -= value; }
+
+        public Task SendToDownstreamAsync(Operation<UserOperationType> operation) => _downstream.SendAsync(operation);
+
+        public Task SendToUpstreamAsync(UserOperationType type, params object[] args) => SendToDownstreamAsync(Operation.Create(type, args));
+
+        public async Task<Operation<ServerOperationType>> ReceiveFromDownstreamAsync() => (await _downstream.ReceiveAsync<Operation<ServerOperationType>>()).Result;
+
+        public event Func<object, Task> ReceiveFromDownstream { add => _downstream.Receive += value; remove => _downstream.Receive -= value; }
 
     }
 }
