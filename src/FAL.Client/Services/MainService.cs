@@ -47,7 +47,7 @@ namespace FAL.Client.Services
             }
             var player = new LocalPlayer(HubConnection);
 
-            HubConnection.On<Operation<ServerOperationType>>("GameOperation", x => player.SendToUpstreamAsync(x));
+            HubConnection.On<Operation<ServerOperationType>>("GameOperation", x => player.SendViaUpstreamAsync(x));
             player.ReceiveFromUpstream += async obj => await HubConnection.SendAsync("GameOperation", obj);
 
             var client = Container.Resolve<FALClientService>();

@@ -73,7 +73,7 @@ namespace FAL.Server.Services
             return true;
         }
 
-        public Task GameOperation(string connectionId, Operation<UserOperationType> operation) => Users[connectionId].CurrentPlayer.SendToDownstreamAsync(operation);
+        public Task GameOperation(string connectionId, Operation<UserOperationType> operation) => Users[connectionId].CurrentPlayer.SendViaDownstreamAsync(operation);
 
         public void Disconnect(string connectionId)
         {

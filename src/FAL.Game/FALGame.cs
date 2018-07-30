@@ -24,10 +24,10 @@ namespace FAL.Game
             var (playerCards, groundCards) = Deal();
             for (var i = 0; i < 3; i++)
             {
-                await _players[i].SendToUpstreamAsync(ServerOperationType.GameStart);
-                await _players[i].SendToUpstreamAsync(ServerOperationType.GameInformation, new GameInformation(_players.Select(p => (p.Name, p.Score)).ToArray()));
+                await _players[i].SendViaUpstreamAsync(ServerOperationType.GameStart);
+                await _players[i].SendViaUpstreamAsync(ServerOperationType.GameInformation, new GameInformation(_players.Select(p => (p.Name, p.Score)).ToArray()));
                 _players[i].Cards = new List<int>(playerCards[i]);
-                await _players[i].SendToUpstreamAsync(ServerOperationType.UpdateCards, _players[i].Cards);
+                await _players[i].SendViaUpstreamAsync(ServerOperationType.UpdateCards, _players[i].Cards);
             }
             return default;
         }
