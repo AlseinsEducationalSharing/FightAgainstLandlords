@@ -11,9 +11,9 @@ namespace FAL.Client.Services
         public async Task Start(LocalPlayer player)
         {
             _player = player;
-            var op1 = await _player.ReceiveFromDownstreamAsync();
-            var op2 = await _player.ReceiveFromDownstreamAsync();
-            var op3 = await _player.ReceiveFromDownstreamAsync();
+            var op1 = await _player.ReceiveAsync();
+            var op2 = await _player.ReceiveAsync();
+            var op3 = await _player.ReceiveAsync();
         }
     }
 }
